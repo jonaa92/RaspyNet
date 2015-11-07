@@ -1,8 +1,10 @@
 package casasnovas.auger.raspynet;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +20,9 @@ import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class FTPActivity extends AppCompatActivity {
 
@@ -69,6 +74,7 @@ public class FTPActivity extends AppCompatActivity {
                 break;
             case R.id.bRefresh:
                 //Refresh function
+                refresh();
                 if (filesystem != null) {
                     final ListView listView = (ListView) findViewById(R.id.lvLS);
                     String array[] = new String[filesystem.length+1];
@@ -96,9 +102,17 @@ public class FTPActivity extends AppCompatActivity {
         backgroundFTP bf;
         bf = new backgroundFTP();
         bf.execute("ls");
+        try {
+            bf.get(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Log.d("raspynet", "InterruptedEXC: " + e.getMessage());
+        } catch (ExecutionException e) {
+            Log.d("raspynet", "ExecutionEXC: " + e.getMessage());
+        } catch (TimeoutException e) {
+            Log.d("raspynet", "TimeoutEXC: " + e.getMessage());
+        }
     }
     private class backgroundFTP extends AsyncTask <String, Void, Void>{
-
         @Override
         protected Void doInBackground(String... params) {
             switch (params[0]) {

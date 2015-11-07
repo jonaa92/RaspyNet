@@ -30,11 +30,24 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/lvLS" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom">
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end">
+            android:layout_gravity="bottom">
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -71,19 +84,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/bRefresh"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
                 android:onClick="button"
                 android:layout_weight="1"
                 android:text="REFFRESH"
                 android:src="@android:drawable/ic_menu_rotate" />
         </LinearLayout>
-
-        <ListView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:id="@+id/lvLS" />
-
     </LinearLayout>
 
 </RelativeLayout>

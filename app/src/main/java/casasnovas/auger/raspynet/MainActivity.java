@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
         et.setText("provahash8@gmail.com");
         et = (EditText) findViewById(R.id.etPass);
         et.setText("12345");
-//        Intent i = new Intent(getApplicationContext(), NewUserActivity.class);
-//        startActivity(i);
+        Intent i = new Intent(getApplicationContext(), FTPActivity.class);
+        startActivity(i);
 
     }
 
