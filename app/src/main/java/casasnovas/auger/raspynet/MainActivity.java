@@ -25,6 +25,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        EditText et = (EditText) findViewById(R.id.etEmail);
+        et.setText("provahash8@gmail.com");
+        et = (EditText) findViewById(R.id.etPass);
+        et.setText("12345");
 //        Intent i = new Intent(getApplicationContext(), NewUserActivity.class);
 //        startActivity(i);
 
@@ -75,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class backgroundLogin extends AsyncTask<String, Void, Void> {
 
-        boolean result = false;
+        int result;
 
         @Override
         protected void onPostExecute(Void aVoid) {
@@ -83,10 +87,10 @@ public class MainActivity extends AppCompatActivity {
             Button b = (Button) findViewById(R.id.button);
             b.setText(R.string.connect);
             b.setEnabled(true);
-            if (result) {
+            if (result == 1) {
                 Intent i = new Intent(getApplicationContext(), correctActivity.class);
                 startActivity(i);
-            } else {
+            } else if (result == 2) {
                 notRegisteredDialog nrd = notRegisteredDialog.newInstance("backgroundLogin");
                 nrd.show(getFragmentManager(), "10");
             }
@@ -106,13 +110,15 @@ public class MainActivity extends AppCompatActivity {
 
             } catch (IOException e) {
                 Log.d("BackgroundLogin", "Excep: " + e.getMessage());
-                result = false;
+                result = 3;
             }
         }
 
-        private boolean isUserFromDB(String response) {
+        private int isUserFromDB(String response) {
             //Comprueba si el string de respuesta del server es un si o un no
-            return response.contains("Success");
+            if (response.contains("success")) return 1;
+            else if (response.contains("Wrong")) return 2;
+            else return 3;
         }
 
         private String createJsonObject(String pass, String mail) {

@@ -26,6 +26,7 @@ public class NewUserActivity extends AppCompatActivity {
 
 
     }
+    /*TODO: HAY QUE CONTROLAR QUE CUANDO SE LLEGUE AQUI, NO SE PUEDA VOLVER AL ACTIVITY DE LOGIN!*/
 
     public void registrarListener (View v) {
         String username, email, password;
@@ -75,12 +76,12 @@ public class NewUserActivity extends AppCompatActivity {
             //Random r = new Random(); -> Token ha de ser random?
             //Integer token = 6789;
             //String postData = "name:"+user+",email:"+mail+",passw:"+passs+",token:"+token.toString();
-            String postData = createJsonObject("Auger","1234", "auger@gmail.com");
+            String postData = createJsonObject(user,mail,passs);
             String resp = serverInterface.doPost("https://raspynet.herokuapp.com/users", postData);
             b = resp.contains("Success");
         }
     }
-    private String createJsonObject (String user, String pass, String mail){
+    private String createJsonObject (String user, String mail, String pass){
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", user);

@@ -7,9 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-/**
- * Created by Augger on 30/10/2015.
- */
 public class notRegisteredDialog extends DialogFragment{
     static notRegisteredDialog newInstance (String user){
         notRegisteredDialog nrd = new notRegisteredDialog();
@@ -21,7 +18,7 @@ public class notRegisteredDialog extends DialogFragment{
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog ad = new AlertDialog.Builder(getActivity()).setTitle("Error d'autenticacio")
+        return new AlertDialog.Builder(getActivity()).setTitle("Error d'autenticacio")
                 .setPositiveButton(getResources().getString(R.string.yesButton), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -38,6 +35,5 @@ public class notRegisteredDialog extends DialogFragment{
                 })
                 .setMessage("\tError, usuari inexistent. \n" + "\tVol crear-lo? \n")
                 .create();
-        return ad;
     }
 }
