@@ -1,17 +1,14 @@
 package casasnovas.auger.raspynet;
 
-import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -75,19 +72,21 @@ public class FTPActivity extends AppCompatActivity {
             case R.id.bRefresh:
                 //Refresh function
                 refresh();
-                if (filesystem != null) {
+                if (filesystem.length > 0) {
                     final ListView listView = (ListView) findViewById(R.id.lvLS);
                     String array[] = new String[filesystem.length+1];
                     array[0] = "/"+location;
-                    for (int i = 1; i < filesystem.length; ++i) array[i] = filesystem[i-1].getName();
+                    for (int i = 0; i < filesystem.length; ++i) array[i+1] = filesystem[i].getName();
                     listView.setAdapter(new ArrayAdapter<>(getApplication().getApplicationContext(), R.layout.listviewitem, R.id.listviewitemtext, array));
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         /*TODO: para hacer que se mantenga seleccionado un item, hay que crear un layout nuevo*/
-                            TextView selectedItem = (TextView) findViewById(R.id.tvSelectedItem);
-                            selectedItem.setText(filesystem[position+1].getName());
-                            itemSelectedName = filesystem[position+1].getName();
+                            if (position > 0) {
+                                TextView selectedItem = (TextView) findViewById(R.id.tvSelectedItem);
+                                selectedItem.setText(filesystem[position - 1].getName());
+                                itemSelectedName = filesystem[position - 1].getName();
+                            }
                         }
                     });
                 }
@@ -111,10 +110,11 @@ public class FTPActivity extends AppCompatActivity {
         } catch (TimeoutException e) {
             Log.d("raspynet", "TimeoutEXC: " + e.getMessage());
         }
+        Log.d("raspynet", "SIZE: " + filesystem.length);
     }
-    private class backgroundFTP extends AsyncTask <String, Void, Void>{
+    private class backgroundFTP extends AsyncTask <String, Void, Boolean>{
         @Override
-        protected Void doInBackground(String... params) {
+        protected Boolean doInBackground(String... params) {
             switch (params[0]) {
                 case "download":
                     try {
@@ -158,13 +158,12 @@ public class FTPActivity extends AppCompatActivity {
                     }
                     break;
             }
-            return null;
+            return true;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            //Restauramos el valor de los botones
-            super.onPostExecute(aVoid);
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
             ImageButton b = (ImageButton) findViewById(R.id.bFTP);
             b.setEnabled(true);
             b = (ImageButton) findViewById(R.id.bFTPupload);
