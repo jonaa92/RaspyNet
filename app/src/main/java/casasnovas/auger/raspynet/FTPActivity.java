@@ -11,7 +11,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.net.ftp.FTPFile;
 
@@ -44,6 +46,7 @@ public class FTPActivity extends AppCompatActivity {
         b1 = (ImageButton) findViewById(R.id.bRefresh);
         b1.setEnabled(true);
 
+        refresh();
         location = "dir";
         itemSelectedName = null;
     }
@@ -72,7 +75,7 @@ public class FTPActivity extends AppCompatActivity {
             case R.id.bRefresh:
                 //Refresh function
                 refresh();
-                if (filesystem.length > 0) {
+                if (filesystem != null) {
                     final ListView listView = (ListView) findViewById(R.id.lvLS);
                     String array[] = new String[filesystem.length+1];
                     array[0] = "/"+location;
@@ -103,6 +106,7 @@ public class FTPActivity extends AppCompatActivity {
         bf.execute("ls");
         try {
             bf.get(1000, TimeUnit.MILLISECONDS);
+            Log.d("raspynet", "SIZE: " + filesystem.length);
         } catch (InterruptedException e) {
             Log.d("raspynet", "InterruptedEXC: " + e.getMessage());
         } catch (ExecutionException e) {
@@ -110,16 +114,19 @@ public class FTPActivity extends AppCompatActivity {
         } catch (TimeoutException e) {
             Log.d("raspynet", "TimeoutEXC: " + e.getMessage());
         }
-        Log.d("raspynet", "SIZE: " + filesystem.length);
     }
     private class backgroundFTP extends AsyncTask <String, Void, Boolean>{
+        String param;
+        Boolean success;
         @Override
         protected Boolean doInBackground(String... params) {
+            param = params[0];
+            success = false;
             switch (params[0]) {
                 case "download":
                     try {
                         if (itemSelectedName != null) {
-                            serverInterface.downloadFTP("anonymous", "mailinventat", location + "/" + itemSelectedName, Environment.getExternalStorageDirectory().getPath() + "/download/"+itemSelectedName);
+                            success = serverInterface.downloadFTP("anonymous", "mailinventat", location + "/" + itemSelectedName, Environment.getExternalStorageDirectory().getPath() + "/download/"+itemSelectedName);
                         }
 
                     } catch (IOException e) {
@@ -128,7 +135,7 @@ public class FTPActivity extends AppCompatActivity {
                     break;
                 case "upload":
                     try {
-                        serverInterface.uploadFTP("anonymous", "mailinventat", params[1], "dir/" + params[2]);
+                        success = serverInterface.uploadFTP("anonymous", "mailinventat", params[1], "dir/" + params[2]);
                     } catch (IOException e) {
                         Log.d("raspynet", "Exception: " + e.getMessage());
                     }
@@ -144,7 +151,7 @@ public class FTPActivity extends AppCompatActivity {
                     try {
                         if (itemSelectedName != null) {
                             /*TODO: crear un dialog de "estas seguro de querer eliminar?" */
-                            serverInterface.deletefile(location + "/" + itemSelectedName, "anonymous", "patata");
+                            success = serverInterface.deletefile(location + "/" + itemSelectedName, "anonymous", "patata");
                         }
                     } catch (IOException e) {
                         Log.d("raspynet", "Exception: " +e.getMessage());
@@ -152,7 +159,7 @@ public class FTPActivity extends AppCompatActivity {
                     break;
                 case "mkdir":
                     try {
-                        serverInterface.mkdir(location, "anonymous", "patata");
+                        success = serverInterface.mkdir(location, "anonymous", "patata");
                     } catch (IOException e) {
                         Log.d("raspynet", "Exception: " + e.getMessage());
                     }
@@ -168,6 +175,9 @@ public class FTPActivity extends AppCompatActivity {
             b.setEnabled(true);
             b = (ImageButton) findViewById(R.id.bFTPupload);
             b.setEnabled(true);
+
+            if (success) Toast.makeText(getApplicationContext(), "Acció realitzada amb éxit", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(getApplicationContext(), "Wops, hi ha hagut un error", Toast.LENGTH_SHORT).show();
         }
     }
 

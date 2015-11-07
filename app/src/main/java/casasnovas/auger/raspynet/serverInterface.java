@@ -63,22 +63,22 @@ public class serverInterface {
 
     }
 
-    public static void downloadFTP (String user, String pass, String filePath, String savePath) throws IOException {
+    public static boolean downloadFTP (String user, String pass, String filePath, String savePath) throws IOException {
         /*TODO: Aqui se tiene que comprobar si el archivo que se ha descargado existe en el directorio savepath*/
         FTPClient f = new FTPClient();
         f.connect("raspynet.no-ip.org");
         f.login(user, pass);
         FileOutputStream os = new FileOutputStream(savePath);
-        f.retrieveFile(filePath, os);
+        return f.retrieveFile(filePath, os);
     }
     //UploadPath -> Directorio del server
     //SavePath -> Directorio del movil
-    public static void uploadFTP (String user, String pass, String savePath, String uploadPath) throws IOException {
+    public static boolean uploadFTP (String user, String pass, String savePath, String uploadPath) throws IOException {
     FTPClient f = new FTPClient();
         f.connect("raspynet.no-ip.org");
         f.login(user, pass);
         FileInputStream is = new FileInputStream(savePath);
-        f.storeFile(uploadPath, is);
+        return f.storeFile(uploadPath, is);
     }
 
     public static FTPFile[] lsFTP(String directory, String user, String pass) throws IOException {
@@ -87,17 +87,17 @@ public class serverInterface {
         f.login(user, pass);
         return f.listFiles(directory);
     }
-    public static void deletefile (String filePath, String user, String pass) throws IOException {
+    public static boolean deletefile (String filePath, String user, String pass) throws IOException {
         FTPClient f = new FTPClient();
         f.connect("raspynet.no-ip.org");
         f.login(user, pass);
-        f.deleteFile(filePath);
+        return f.deleteFile(filePath);
     }
 
-    public static void mkdir(String location, String user, String pass) throws IOException {
+    public static boolean mkdir(String location, String user, String pass) throws IOException {
         FTPClient f = new FTPClient();
         f.connect("raspynet.no-ip.org");
         f.login(user, pass);
-        f.makeDirectory(location);
+        return f.makeDirectory(location);
     }
 }

@@ -34,6 +34,9 @@ public class correctActivity extends AppCompatActivity {
             case R.id.bSettings:
                 Toast.makeText(getApplicationContext(), "No esta implementado", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.bLogout:
+                Intent logout = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(logout);
         }
     }
 
