@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 result = isUserFromDB(bufferLectura);
 
             } catch (IOException e) {
-                Log.d("BackgroundLogin", "Excep: " + e.getMessage());
+                Log.d("raspynet", "Excep: " + e.getMessage());
                 result = 3;
             }
         }

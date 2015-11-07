@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +28,8 @@ public class NewUserActivity extends AppCompatActivity {
 
     }
     /*TODO: HAY QUE CONTROLAR QUE CUANDO SE LLEGUE AQUI, NO SE PUEDA VOLVER AL ACTIVITY DE LOGIN!*/
+
+
 
     public void registrarListener (View v) {
         String username, email, password;
@@ -54,7 +57,7 @@ public class NewUserActivity extends AppCompatActivity {
             try {
                 postNewUser(params[0], params[1], params[2]);
             } catch (IOException e) {
-                Log.d("backgroundRegister", "IOException: "+e.getMessage());
+                Log.d("raspynet", "IOException: "+e.getMessage());
             }
             return null;
         }

@@ -22,8 +22,7 @@ public class serverInterface {
         final String charset = "UTF-8";
         // Conexion
 
-        Log.d("urlconnect", urlParameters);
-        Log.d("urlconnect", "URL: "+url);
+        Log.d("raspynet", "URL: "+url+ " With: " + urlParameters);
 
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         byte[] postData = urlParameters.getBytes(Charset.forName("UTF-8"));
@@ -57,8 +56,8 @@ public class serverInterface {
             response.append(inputLine);
         }
         responseReader.close();
-        Log.d("urlconnect", "SERVER RESPONSE CODE: " + connection.getResponseCode());
-        Log.d("urlconnect", "SERVER RESPONSE: " + response);
+        Log.d("raspynet", "SERVER RESPONSE CODE: " + connection.getResponseCode());
+        Log.d("raspynet", "SERVER RESPONSE: " + response);
 
         return response.toString();
 
@@ -93,5 +92,12 @@ public class serverInterface {
         f.connect("raspynet.no-ip.org");
         f.login(user, pass);
         f.deleteFile(filePath);
+    }
+
+    public static void mkdir(String location, String user, String pass) throws IOException {
+        FTPClient f = new FTPClient();
+        f.connect("raspynet.no-ip.org");
+        f.login(user, pass);
+        f.makeDirectory(location);
     }
 }

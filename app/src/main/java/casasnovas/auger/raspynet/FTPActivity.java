@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,22 +30,20 @@ public class FTPActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Button b = (Button) findViewById(R.id.bFTP);
-        b.setText("DOWNLOAD");
+        ImageButton b = (ImageButton) findViewById(R.id.bFTP);
         b.setEnabled(true);
 
-        Button b1 = (Button) findViewById(R.id.bFTPupload);
-        b1.setText("UPLOAD");
+        ImageButton b1 = (ImageButton) findViewById(R.id.bFTPupload);
+        b1.setEnabled(true);
+
+        b1 = (ImageButton) findViewById(R.id.bDelete);
+        b1.setEnabled(true);
+
+        b1 = (ImageButton) findViewById(R.id.bRefresh);
         b1.setEnabled(true);
 
         location = "dir";
         itemSelectedName = null;
-        TextView tv = (TextView) findViewById(R.id.tvCurrent);
-        tv.setText("Current directory: " + location);
-        backgroundFTP bf;
-        bf = new backgroundFTP();
-        bf.execute("ls");
-
     }
     public void button (View v){
         final backgroundFTP bf;
@@ -52,8 +51,7 @@ public class FTPActivity extends AppCompatActivity {
         switch (v.getId()){
             case R.id.bFTP:
                 bf.execute("download");
-                Button b = (Button) findViewById(R.id.bFTP);
-                b.setText(" CONNECTING... ");
+                ImageButton b = (ImageButton) findViewById(R.id.bFTP);
                 b.setEnabled(false);
                 break;
             case R.id.bFTPupload:
@@ -61,29 +59,32 @@ public class FTPActivity extends AppCompatActivity {
                 fc.setFileListener(new fileChooser.FileSelectedListener() {
                     @Override
                     public void fileSelected(File file) {
-                        Log.d("filechooser", "File to upload: " + file.getPath());
+                        Log.d("raspynet", "File to upload: " + file.getPath());
                         bf.execute("upload", file.getPath(), file.getName());
-                        Button b1 = (Button) findViewById(R.id.bFTPupload);
-                        b1.setText(" UPLOADING... ");
+                        ImageButton b1 = (ImageButton) findViewById(R.id.bFTPupload);
                         b1.setEnabled(false);
 
                     }
                 }).showDialog();
                 break;
             case R.id.bRefresh:
-                final ListView listView = (ListView) findViewById(R.id.lvLS);
-                String array[] = new String[filesystem.length];
-                for (int i=0; i<filesystem.length; ++i) array[i] = filesystem[i].getName();
-                listView.setAdapter(new ArrayAdapter<>(getApplication().getApplicationContext(), R.layout.listviewitem, R.id.listviewitemtext, array));
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Refresh function
+                if (filesystem != null) {
+                    final ListView listView = (ListView) findViewById(R.id.lvLS);
+                    String array[] = new String[filesystem.length+1];
+                    array[0] = "/"+location;
+                    for (int i = 1; i < filesystem.length; ++i) array[i] = filesystem[i-1].getName();
+                    listView.setAdapter(new ArrayAdapter<>(getApplication().getApplicationContext(), R.layout.listviewitem, R.id.listviewitemtext, array));
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         /*TODO: para hacer que se mantenga seleccionado un item, hay que crear un layout nuevo*/
-                        TextView selectedItem = (TextView) findViewById(R.id.tvSelectedItem);
-                        selectedItem.setText(filesystem[position].getName());
-                        itemSelectedName = filesystem[position].getName();
-                    }
-                });
+                            TextView selectedItem = (TextView) findViewById(R.id.tvSelectedItem);
+                            selectedItem.setText(filesystem[position+1].getName());
+                            itemSelectedName = filesystem[position+1].getName();
+                        }
+                    });
+                }
                 break;
             case R.id.bDelete:
                 bf.execute("delete");
@@ -91,7 +92,11 @@ public class FTPActivity extends AppCompatActivity {
 
     }
 
-
+    private void refresh (){
+        backgroundFTP bf;
+        bf = new backgroundFTP();
+        bf.execute("ls");
+    }
     private class backgroundFTP extends AsyncTask <String, Void, Void>{
 
         @Override
@@ -104,21 +109,21 @@ public class FTPActivity extends AppCompatActivity {
                         }
 
                     } catch (IOException e) {
-                        Log.d("ftpconnectDownload", "Exception: " + e.getMessage());
+                        Log.d("raspynet", "Exception: " + e.getMessage());
                     }
                     break;
                 case "upload":
                     try {
                         serverInterface.uploadFTP("anonymous", "mailinventat", params[1], "dir/" + params[2]);
                     } catch (IOException e) {
-                        Log.d("ftpconnectUpload", "Exception: " + e.getMessage());
+                        Log.d("raspynet", "Exception: " + e.getMessage());
                     }
                     break;
                 case "ls":
                     try {
                         filesystem = serverInterface.lsFTP(location, "anonymous", "patata");
                     } catch (IOException e) {
-                        Log.d("ftpconnectLS", "Exception: " + e.getMessage());
+                        Log.d("raspynet", "Exception: " + e.getMessage());
                     }
                     break;
                 case "delete":
@@ -128,8 +133,16 @@ public class FTPActivity extends AppCompatActivity {
                             serverInterface.deletefile(location + "/" + itemSelectedName, "anonymous", "patata");
                         }
                     } catch (IOException e) {
-                        Log.d("ftpconnectDelete", "Exception: " +e.getMessage());
+                        Log.d("raspynet", "Exception: " +e.getMessage());
                     }
+                    break;
+                case "mkdir":
+                    try {
+                        serverInterface.mkdir(location, "anonymous", "patata");
+                    } catch (IOException e) {
+                        Log.d("raspynet", "Exception: " + e.getMessage());
+                    }
+                    break;
             }
             return null;
         }
@@ -138,12 +151,10 @@ public class FTPActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             //Restauramos el valor de los botones
             super.onPostExecute(aVoid);
-            Button b = (Button) findViewById(R.id.bFTP);
-            b.setText("DOWNLOAD");
+            ImageButton b = (ImageButton) findViewById(R.id.bFTP);
             b.setEnabled(true);
-            Button b1 = (Button) findViewById(R.id.bFTPupload);
-            b1.setText("UPLOAD");
-            b1.setEnabled(true);
+            b = (ImageButton) findViewById(R.id.bFTPupload);
+            b.setEnabled(true);
         }
     }
 
